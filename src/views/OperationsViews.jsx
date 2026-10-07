@@ -54,7 +54,7 @@ export function POSView({ products, items, setItems, navigate, notify }) {
           <div className="order-items">
             {items.map((item) => <article className="order-item" key={item.id}>
               <div className="order-item-line"><div><strong>{item.name}</strong>{item.details && <small>{item.details}</small>}</div><span>{money(item.price * item.quantity)}</span></div>
-              <div className="order-item-controls"><QuantityStepper value={item.quantity} onChange={(quantity) => setItems((current) => current.map((entry) => entry.id === item.id ? { ...entry, quantity } : entry))} /><button className="icon-button delete-item" type="button" aria-label={`Quitar ${item.name}`} onClick={() => setItems((current) => current.filter((entry) => entry.id !== item.id))}><Icon name="delete" /></button></div>
+              <div className="order-item-controls"><QuantityStepper value={item.quantity} onChange={(quantity) => setItems((current) => current.map((entry) => entry.id === item.id ? { ...entry, quantity } : entry))} label={`Cantidad de ${item.name}`} /><button className="icon-button delete-item" type="button" aria-label={`Quitar ${item.name}`} onClick={() => setItems((current) => current.filter((entry) => entry.id !== item.id))}><Icon name="delete" /></button></div>
             </article>)}
             {!items.length && <p className="empty-state">Agrega productos para iniciar una orden.</p>}
           </div>
@@ -80,7 +80,7 @@ export function InventoryView({ inventory, setInventory, notify }) {
     event.preventDefault()
     const values = new FormData(event.currentTarget)
     const stock = Number(values.get('stock'))
-    const next = { id: `stock-${Date.now()}`, name: values.get('name').trim(), category: values.get('category').trim(), stock, unit: values.get('unit').trim(), status: 'Suficiente', image: '' }
+    const next = { id: `stock-${Date.now()}`, name: values.get('name').trim(), category: values.get('category').trim(), stock, unit: values.get('unit').trim(), status: stock === 0 ? 'Agotado' : 'Suficiente', image: '' }
     setInventory((current) => [...current, next])
     setShowForm(false)
     notify('Producto agregado al inventario')

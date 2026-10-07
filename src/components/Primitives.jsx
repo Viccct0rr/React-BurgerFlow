@@ -27,10 +27,10 @@ export function StatusBadge({ children, tone = 'neutral' }) {
 
 export function QuantityStepper({ value, onChange, label = 'Cantidad' }) {
   return (
-    <div className="quantity-stepper" aria-label={label}>
-      <button type="button" aria-label="Disminuir cantidad" onClick={() => onChange(Math.max(1, value - 1))}><Icon name="remove" /></button>
+    <div className="quantity-stepper" role="group" aria-label={label}>
+      <button type="button" aria-label={`Disminuir ${label.toLowerCase()}`} disabled={value <= 1} onClick={() => onChange(Math.max(1, value - 1))}><Icon name="remove" /></button>
       <span aria-live="polite">{value}</span>
-      <button type="button" aria-label="Aumentar cantidad" onClick={() => onChange(value + 1)}><Icon name="add" /></button>
+      <button type="button" aria-label={`Aumentar ${label.toLowerCase()}`} onClick={() => onChange(value + 1)}><Icon name="add" /></button>
     </div>
   )
 }
@@ -61,5 +61,5 @@ export function ProductCard({ product, onAction, actionLabel = 'Personalizar', c
 }
 
 export function OrderItem({ item, onQuantityChange, onRemove }) {
-  return <article className="checkout-item"><img src={item.image} alt={item.name} /><div className="checkout-item-main"><div className="checkout-item-title"><h2>{item.name}</h2><strong>Bs {item.price.toFixed(2)}</strong></div>{item.details && <p>{item.details}</p>}<QuantityStepper value={item.quantity} onChange={onQuantityChange} /></div><button className="remove-cart-item" type="button" aria-label={`Eliminar ${item.name}`} onClick={onRemove}><Icon name="delete" /></button></article>
+  return <article className="checkout-item"><img src={item.image} alt={item.name} /><div className="checkout-item-main"><div className="checkout-item-title"><h2>{item.name}</h2><strong>Bs {item.price.toFixed(2)}</strong></div>{item.details && <p>{item.details}</p>}<QuantityStepper value={item.quantity} onChange={onQuantityChange} label={`Cantidad de ${item.name}`} /></div><button className="remove-cart-item" type="button" aria-label={`Eliminar ${item.name}`} onClick={onRemove}><Icon name="delete" /></button></article>
 }

@@ -22,6 +22,8 @@ npm run preview
 
 Las rutas principales son `/dashboard`, `/pos`, `/cart`, `/inventory`, `/menu`, `/kitchen`, `/delivery`, `/reports` y `/settings`. La ruta raíz abre el panel principal y cualquier ruta no reconocida muestra una pantalla 404 dentro de la aplicación.
 
+El carrito se mantiene en el estado compartido de la aplicación al cambiar de vista y se guarda en el almacenamiento local del navegador para conservar los productos y sus cantidades después de recargar. El control `QuantityStepper` se reutiliza en la personalización de productos y en el checkout.
+
 La compilación genera también `dist/404.html` como fallback para que GitHub Pages pueda servir la aplicación al abrir o recargar una ruta interna. El workflow de `.github/workflows/deploy-pages.yml` publica `dist/` en GitHub Pages; Vite configura automáticamente `/React-BurgerFlow/` como base durante ese workflow. En otros hosts estáticos hay que configurar su fallback equivalente para que las rutas de la aplicación sirvan `index.html` (o `404.html`).
 
 La aplicación actual usa datos locales de demostración y no configura APIs ni autenticación.

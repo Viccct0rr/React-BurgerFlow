@@ -19,15 +19,43 @@ const getCurrentPage = () => {
   return pathname.replace(/^\/+|\/+$/g, '') || 'dashboard'
 }
 
+const initialCartItems = [
+  { id: 'cart-bacon', name: 'Double Bacon Smash', price: 14.5, quantity: 1, details: '+ Extra Bacon, Sin Cebolla', image: menuProducts[0].image },
+  { id: 'cart-fries', name: 'Crinkle Fries (L)', price: 4.5, quantity: 1, details: 'Salsa de Queso Aparte', image: products[3].image },
+]
+const cartStorageKey = 'burgerflow-cart-v1'
+
+const loadCartItems = () => {
+  try {
+    const savedCart = window.localStorage.getItem(cartStorageKey)
+    if (!savedCart) return initialCartItems
+
+    const parsedCart = JSON.parse(savedCart)
+    const isValidCart = Array.isArray(parsedCart) && parsedCart.every((item) => (
+      typeof item.id === 'string'
+      && typeof item.name === 'string'
+      && Number.isFinite(item.price)
+      && Number.isInteger(item.quantity)
+      && item.quantity > 0
+    ))
+
+    if (isValidCart) return parsedCart
+
+    console.warn('El carrito guardado no tiene un formato válido; se restaurará el carrito inicial.')
+    window.localStorage.removeItem(cartStorageKey)
+  } catch (error) {
+    console.warn('No se pudo leer el carrito guardado; se restaurará el carrito inicial.', error)
+  }
+
+  return initialCartItems
+}
+
 function App() {
   const [page, setPage] = useState(getCurrentPage)
   const [toast, setToast] = useState('')
   const [inventory, setInventory] = useState(inventorySeed)
   const [selectedProduct, setSelectedProduct] = useState(menuProducts[0])
-  const [cartItems, setCartItems] = useState([
-    { id: 'cart-bacon', name: 'Double Bacon Smash', price: 14.5, quantity: 1, details: '+ Extra Bacon, Sin Cebolla', image: menuProducts[0].image },
-    { id: 'cart-fries', name: 'Crinkle Fries (L)', price: 4.5, quantity: 1, details: 'Salsa de Queso Aparte', image: products[3].image },
-  ])
+  const [cartItems, setCartItems] = useState(loadCartItems)
   const [posItems, setPosItems] = useState([
     { id: 'pos-flow', productId: 'flow-burger', name: 'Doble Flow Burger', price: 12.5, quantity: 1, details: 'Sin cebolla, Extra queso' },
     { id: 'pos-fries', productId: 'fries', name: 'Papas Clásicas (L)', price: 4.5, quantity: 2, details: '' },
@@ -50,6 +78,14 @@ function App() {
     window.addEventListener('popstate', syncPageWithLocation)
     return () => window.removeEventListener('popstate', syncPageWithLocation)
   }, [])
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(cartStorageKey, JSON.stringify(cartItems))
+    } catch (error) {
+      console.error('No se pudo guardar el carrito en este navegador.', error)
+    }
+  }, [cartItems])
 
   const notify = (message) => {
     setToast(message)

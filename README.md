@@ -1,16 +1,27 @@
-# React + Vite
+# BurgerFlow
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Aplicación de gestión de restaurante construida con React 19 y Vite 8. La interfaz es una SPA: las vistas se renderizan en el cliente y la navegación usa la History API, de modo que las transiciones internas no recargan el documento y Atrás/Adelante restauran la ruta.
 
-Currently, two official plugins are available:
+## Requisitos
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Node.js 24 (el mismo runtime configurado para el despliegue de GitHub Pages)
+- npm
 
-## React Compiler
+## Desarrollo y compilación
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```sh
+npm ci
+npm run dev
+npm run build
+npm run preview
+```
 
-## Expanding the Oxlint configuration
+`npm run build` genera los archivos estáticos en `dist/`. No hay comandos configurados de lint ni pruebas automatizadas actualmente.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## Rutas y despliegue
+
+Las rutas principales son `/dashboard`, `/pos`, `/cart`, `/inventory`, `/menu`, `/kitchen`, `/delivery`, `/reports` y `/settings`. La ruta raíz abre el panel principal y cualquier ruta no reconocida muestra una pantalla 404 dentro de la aplicación.
+
+La compilación genera también `dist/404.html` como fallback para que GitHub Pages pueda servir la aplicación al abrir o recargar una ruta interna. El workflow de `.github/workflows/deploy-pages.yml` publica `dist/` en GitHub Pages; Vite configura automáticamente `/React-BurgerFlow/` como base durante ese workflow. En otros hosts estáticos hay que configurar su fallback equivalente para que las rutas de la aplicación sirvan `index.html` (o `404.html`).
+
+La aplicación actual usa datos locales de demostración y no configura APIs ni autenticación.

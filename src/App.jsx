@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import AppShell from './components/AppShell.jsx'
 import { Toast } from './components/Primitives.jsx'
 import { CartView, CustomizerView, MenuView } from './views/CustomerViews.jsx'
@@ -8,8 +8,19 @@ import { inventorySeed, menuProducts, navItems, products } from './data.js'
 import './App.css'
 import './views.css'
 
+const getCurrentPage = () => {
+  const basePath = import.meta.env.BASE_URL.replace(/\/$/, '')
+  let pathname = window.location.pathname
+
+  if (basePath && basePath !== '/' && pathname.startsWith(basePath)) {
+    pathname = pathname.slice(basePath.length)
+  }
+
+  return pathname.replace(/^\/+|\/+$/g, '') || 'dashboard'
+}
+
 function App() {
-  const [page, setPage] = useState('dashboard')
+  const [page, setPage] = useState(getCurrentPage)
   const [toast, setToast] = useState('')
   const [inventory, setInventory] = useState(inventorySeed)
   const [selectedProduct, setSelectedProduct] = useState(menuProducts[0])
@@ -30,6 +41,16 @@ function App() {
     { id: '4081', type: 'Delivery · DoorDash', time: '11:48 AM', age: '', minutes: 0, status: 'ready', items: [{ qty: 1, name: 'Mushroom Swiss Burger' }, { qty: 1, name: 'Fries (Small)' }], note: 'Driver arrived' },
   ])
 
+  useEffect(() => {
+    const syncPageWithLocation = () => {
+      setPage(getCurrentPage())
+      setToast('')
+    }
+
+    window.addEventListener('popstate', syncPageWithLocation)
+    return () => window.removeEventListener('popstate', syncPageWithLocation)
+  }, [])
+
   const notify = (message) => {
     setToast(message)
     window.clearTimeout(notify.timer)
@@ -37,6 +58,9 @@ function App() {
   }
 
   const navigate = (destination) => {
+    if (destination !== page) {
+      window.history.pushState({}, '', `${import.meta.env.BASE_URL}${destination}`)
+    }
     setPage(destination)
     setToast('')
   }
@@ -55,7 +79,18 @@ function App() {
     settings: <ReportsView navigate={navigate} />,
   }
 
-  return <AppShell page={page} navItems={navItems} navigate={navigate} notify={notify} toast={toast}>{views[page] ?? views.dashboard}</AppShell>
+  const currentView = views[page] ?? (
+    <main className="page-content not-found-view">
+      <section className="panel dashboard-placeholder">
+        <p className="eyebrow">Error 404</p>
+        <h1>Página no encontrada</h1>
+        <p>La dirección no corresponde a una vista de BurgerFlow.</p>
+        <button className="primary-button" type="button" onClick={() => navigate('dashboard')}>Volver al panel principal</button>
+      </section>
+    </main>
+  )
+
+  return <AppShell page={page} navItems={navItems} navigate={navigate} notify={notify} toast={toast}>{currentView}</AppShell>
 }
 
 export default App
